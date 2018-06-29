@@ -212,8 +212,8 @@ transactionSpecs wRef wc = do
         -- we have to create HD address because we will sync this wallet
         -- with the blockchain to see its actual balance
 
-        -- create HD secret key based on the 'encSecretKey'.
-        let noPassCheck = ShouldCheckPassphrase False
+        -- create HD secret key based on the 'encSecretKey'
+        let noPassCheck = ShouldCheckPassphrase True
             accountIndex = accIndex anAccount
             (Just hdSecretKey) = deriveHDSecretKey noPassCheck
                                                    emptyPassphrase
@@ -221,7 +221,7 @@ transactionSpecs wRef wc = do
                                                    accountIndex
 
         -- we need HD passphrase to read HD derivation path later,
-        -- during synchronization.
+        -- during synchronization with the blockchain
         addrIndex <- randomAddressIndex
         let hdPassphrase = deriveHDPassphrase publicKey
             forBootstrapEra = Core.IsBootstrapEraAddr True
@@ -233,6 +233,9 @@ transactionSpecs wRef wc = do
                                                           [accountIndex]
                                                           addrIndex
             anAddressAsBase58 = Core.addrToBase58Text anAddress
+
+        let addressCreatedFromThisPK = Core.checkPubKeyAddress publicKey anAddress
+        addressCreatedFromThisPK `shouldBe` True
 
         -- store this HD-address in the wallet's account
         storeResponse <- postStoreAddress wc

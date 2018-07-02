@@ -10,8 +10,8 @@ import           Control.Lens (_Left)
 import           Data.Map (fromList)
 import           Data.Traversable (for)
 import           Data.X509.File (readSignedObject)
-import           Network.HTTP.Client (Manager, ManagerSettings, managerModifyRequest,
-                                      requestVersion)
+import           Network.HTTP.Client (Manager, ManagerSettings,
+                     managerModifyRequest, requestVersion)
 import           Network.HTTP.Types (status505)
 import           Network.HTTP.Types.Version (http20)
 import           System.Environment (withArgs)
@@ -84,7 +84,7 @@ main = do
         either (fail . ("Error decoding X509 certificates: " <>)) return
 
     actionDistribution :: ActionProbabilities
-    actionDistribution = do
+    actionDistribution =
         (PostWallet, Weight 2)
             :| (PostTransaction, Weight 5)
             : fmap (\x -> (x, Weight 1)) [minBound .. maxBound]
@@ -103,7 +103,7 @@ initialWalletState wc = do
         _transactions     = mempty
         _actionsNum       = 0
         _successActions   = mempty
-    pure $ WalletState {..}
+    pure WalletState {..}
   where
     fromResp = (either throwM (pure . wrData) =<<)
 
